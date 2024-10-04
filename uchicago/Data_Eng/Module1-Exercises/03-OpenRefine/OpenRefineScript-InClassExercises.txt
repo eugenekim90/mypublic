@@ -1,0 +1,69 @@
+URL( localhost ) :- 
+http://127.0.0.1:3333/
+
+GREL - General Refine Expression Language
+
+-------------------------------------------------------
+Data(Stocks.Zip - JSON)
+- Language  Setting to English
+- Create Project > Browse > Stocks.zip
+- click on the top level enclosures to get to tabular format
+- once preview is available  
+   - enable the Trim leading and trailing whitespace from strings ( options below the table)
+   - enable the Parse cell text into numbers/dates
+Save Project Name > create Project
+Click on ALL ( left corner) > Edit Columns > reorder / remove columns ( enables to discard irrelevant columns )
+click on any cell and edit the cell with any information
+Click on dropdowns for any column ( say Volume ) > sort  ( choose options as applicable )
+
+-------------------------------------------------------
+Data ( stocks_demo.csv - Webservice calls [subset of the original zip file])
+- Create Project > Browse > stocks_demo.csv
+- Save Project Name > create Project
+- Ticker > Edit Column > Add Columns by fetching URLs
+   - Test the below URLs on a browser to make sure it works
+      https://financialmodelingprep.com/api/v3/profile/IBM?apikey=9bece7960234db88ff0372f043a2cc65
+	  
+   - Invoking Web API from Open Refine
+      'https://financialmodelingprep.com/api/v3/profile/' + escape(value,'url') + '?apikey=9bece7960234db88ff0372f043a2cc65'
+	  - Save column name as LatestTickerData
+	  
+   - Format to get the current price. click on LatestTickerData > Edit Cells > Transform
+      value.partition("{")[2].partition(":")[2].partition(":")[2].partition(",")[0]
+	  - updates the column with the Last price of the stock
+	  
+-------------------------------------------------------
+Data ( Customers-messy.zip - Webservice calls [subset of the original zip file])
+- unzip the file ( 7-Zip) to get to the CSV
+- understand the data
+- Create Project > Browse > Customers-messy.zip
+- Make sure the data loaded is the same
+- click on character encoding ( browse through the many options available)  > select UTF-8
+- Save Project Name > create Project
+- Combine contact firstName and contact lastName to contact fullName
+   - click on contact firstName > Edit Cells > Common transforms > trim Leading and trailing whitespace
+   - click on contact lastName > Edit Cells > Common transforms > trim Leading and trailing whitespace
+   - click on contact firstName > Edit Column > Add Column based on this column
+      - value + " " + cells["contactLastName"].value
+	  - Enter Column name to contactFullName
+   - click on Undo / Redo to play around with the options
+   - click on contact FullName > Edit Columns > Remove this column
+
+- Faceting ( text) 
+   - click on city > Edit Cells > Common transforms > To titlecase
+   - goto Country > facet > Text Facet
+   - on the left window pane scroll down to see United states has been represented differently
+   - Click on cluster to get the overall view
+   - playAround with the on Method options such as key Collision and Keying functions such as fingerprint
+   - Select merge function between clusters and select merge Selected and Recluster
+   - Method > nearest Neighbour & Keying function > PPM select merge and click on merge Selected and Recluster
+
+- Faceting (number)
+   - click on creditLimit > Edit Cells > common transforms > To number
+   - goto creditLimit > facet > Numeric Facet
+   - uncheck the numeric box on the left facet window and click on change
+   - toNumber(value.replace("USD","").replace("$","").replace(",",""))
+   - goto creditLimit > Edit Cells > Transform
+   - toNumber(value.replace("USD","").replace("$","").replace(",",""))
+   - Export > comma seperated value
+
